@@ -1,6 +1,8 @@
 import express from 'express';
-import usersRouter from './routes/users.js';
-import projektiRouter from './routes/projects.js';
+import connectToDatabase from './db.js';
+
+//import usersRouter from './routes/users.js';
+//import projektiRouter from './routes/projects.js';
 //const express = require('express'); //jer smo stavili u package.json type:module umisto commonjs
 const router = express.Router();
 
@@ -10,7 +12,10 @@ const app = express();
 const PORT = 3000;
 app.use(express.json());
 
-app.use('/users', usersRouter);
+
+let db = await connectToDatabase();
+//app.use('/users', usersRouter);
+//app.use('/projects', projektiRouter);
 
 app.listen(PORT, error => {
     if(error){
