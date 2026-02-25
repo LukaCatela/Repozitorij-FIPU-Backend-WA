@@ -14,8 +14,10 @@ app.use(cors());
 app.use(express.json());
 
 connectToDatabase().then(() => {
-  //app.use('/users', usersRouter);
-  //app.use('/projects', projektiRouter);
+  //app.use("/api/users", usersRouter);
+  //app.use("/api/projects", projektiRouter);
+  app.use("/api/auth", authRouter);
+  //app.use("/api/profiles", profilesRouter);
 
   app.listen(PORT, (error) => {
     if (error) {
