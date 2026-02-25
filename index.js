@@ -1,5 +1,6 @@
-import express from 'express';
-import connectToDatabase from './db.js';
+import express from "express";
+import cors from "cors";
+import connectToDatabase from "./config/db.js";
 
 //import usersRouter from './routes/users.js';
 //import projektiRouter from './routes/projects.js';
@@ -8,24 +9,22 @@ const router = express.Router();
 
 const app = express();
 
-
 const PORT = 3000;
+app.use(cors());
 app.use(express.json());
 
+connectToDatabase().then(() => {
+  //app.use('/users', usersRouter);
+  //app.use('/projects', projektiRouter);
 
-let db = await connectToDatabase();
-//app.use('/users', usersRouter);
-//app.use('/projects', projektiRouter);
-
-app.listen(PORT, error => {
-    if(error){
-        console.error(`Greška prilikom pokretanja poslužitelja: ${error.message}`);
+  app.listen(PORT, (error) => {
+    if (error) {
+      console.error(
+        `Greška prilikom pokretanja poslužitelja: ${error.message}`,
+      );
     } else {
-        console.log(`Server dela na portu: ${PORT}`);
-    };
+      console.log(`Server dela na portu: ${PORT}`);
+    }
+  });
 });
-;
-
-
-
 export default router;

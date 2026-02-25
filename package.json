@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/LukaCatela/Repozitorij-FIPU-Backend-WA#readme",
   "dependencies": {
+    "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.1.0",
     "mongodb": "^7.1.0"
