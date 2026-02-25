@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import connectToDatabase from "./config/db.js";
 
+import authRouter from "./routes/auth.js";
 //import usersRouter from './routes/users.js';
 //import projektiRouter from './routes/projects.js';
 //const express = require('express'); //jer smo stavili u package.json type:module umisto commonjs
