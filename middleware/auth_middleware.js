@@ -1,9 +1,12 @@
 import jwt from "jsonwebtoken";
 
 export default function authMiddleware(req, res, next) {
-  const token = req.headers.authorization?.split(" ")[1]; //objasnit
+  const token = req.headers.authorization?.split(" ")[1]; //npr. Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9 -> pa uzme samo ovaj drugi dio koji je token
   if (!token) return res.status(401).json({ error: "Nema tokena" });
   try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
   } catch (error) {
     res.status(401).json({ error: "Krivi tokena" });
   }

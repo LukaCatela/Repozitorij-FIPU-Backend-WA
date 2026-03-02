@@ -2,6 +2,8 @@ import { Router } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import connectToDatabase from "../config/db.js";
+import authMiddleware from "../middleware/auth_middleware.js";
+import { ObjectId } from "mongodb";
 
 const router = Router();
 
@@ -10,19 +12,20 @@ router.post("/register", async (req, res) => {
   try {
     const db = await connectToDatabase();
 
-    const { name, surname, email, password, role } = req.body;
+    const { FirstName, LastName, email, password, role } = req.body;
 
-    if (!name || !surname || !email || !password)
+    if (!FirstName || !LastName || !email || !password)
       return res.status(400).json({ error: "Potrebna sva polja" });
 
     const existing = await db.collection("users").findOne({ email });
     if (existing) return res.status(400).json({ error: "Email vec postoji" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
+    const user_id = (await db.collection("users").count()) + 1;
     const newUser = {
-      name,
-      surname,
+      user_id,
+      FirstName,
+      LastName,
       email,
       password: hashedPassword,
       role: role || "gost",
@@ -55,7 +58,7 @@ router.post("/login", async (req, res) => {
     if (!isMatch) return res.status(400).json({ error: "Krivi podaci" });
 
     const token = jwt.sign(
-      { id: user._id, role: user.role, email: user.email },
+      { id: user.user_id, role: user.role, email: user.email },
       process.env.JWT_SECRET,
       { expiresIn: "7d" },
     );
@@ -69,4 +72,18 @@ router.post("/login", async (req, res) => {
   }
 });
 
+router.get("/me", authMiddleware, async (req, res) => {
+  try {
+    const db = await connectToDatabase();
+    const user = await db
+      .collection("users")
+      .findOne(
+        { _id: new ObjectId(req.body.id) },
+        { projection: { password: 0 } },
+      );
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
 export default router;
