@@ -3,6 +3,7 @@ import cors from "cors";
 import connectToDatabase from "./config/db.js";
 
 import authRouter from "./routes/auth.js";
+import profilesRouter from "./routes/profiles.js";
 //import usersRouter from './routes/users.js';
 //import projektiRouter from './routes/projects.js';
 //const express = require('express'); //jer smo stavili u package.json type:module umisto commonjs
@@ -17,8 +18,8 @@ app.use(express.json());
 connectToDatabase().then(() => {
   //app.use("/api/users", usersRouter);
   //app.use("/api/projects", projektiRouter);
-  app.use("/api/auth", authRouter);
-  //app.use("/api/profiles", profilesRouter);
+  app.use("/auth", authRouter);
+  app.use("/profiles", profilesRouter);
 
   app.listen(PORT, (error) => {
     if (error) {

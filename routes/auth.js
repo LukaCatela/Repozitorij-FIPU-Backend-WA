@@ -7,7 +7,7 @@ import { ObjectId } from "mongodb";
 
 const router = Router();
 
-// POST /api/auth/register
+// POST /api/auth/register -- registracija user-a
 router.post("/register", async (req, res) => {
   try {
     const db = await connectToDatabase();
@@ -42,7 +42,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// POST /api/auth/login
+// POST /api/auth/login -- login user-a
 router.post("/login", async (req, res) => {
   try {
     const db = await connectToDatabase();
