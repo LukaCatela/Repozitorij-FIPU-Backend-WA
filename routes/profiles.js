@@ -50,7 +50,7 @@ router.post("/", authMiddleware, async (req, res) => {
   }
 });
 
-//PATCH   /:userId  -- updejtaj cijeli moj profil (user)
+//PUT   /:userId  -- updejtaj cijeli moj profil (user)
 router.put("/:userId", authMiddleware, async (req, res) => {
   if (req.user.id !== req.params.userId)
     return res.status(403).json({ error: "Pristup zabranjen" });
@@ -72,6 +72,34 @@ router.put("/:userId", authMiddleware, async (req, res) => {
     );
 
     res.status(200).json({ message: "Profil updejtan" });
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+//PATCH /:userId -- updejt samo parametar koji user posalje
+router.patch("/:userId", authMiddleware, async (req, res) => {
+  if (req.user.id !== req.params.userId)
+    return res.status(403).json({ error: "Pristup zabranjen" });
+
+  try {
+    const db = connectToDatabase();
+    const updateFields = {};
+    if (req.body.bio !== undefined) updateFields.bio = req.body.bio;
+    if (req.body.study_year !== undefined)
+      updateFields.study_year = req.body.study_year;
+    if (req.body.department !== undefined)
+      updateFields.department = req.body.department;
+    if (req.body.skill !== undefined) updateFields.skill = req.body.skill;
+    if (req.body.social !== undefined) updateFields.social = req.body.social;
+
+    await db
+      .collection("profiles")
+      .updateOne(
+        { user_id: new ObjectId(req.params.userId) },
+        { $set: updateFields },
+      );
+    return res.status(200).json({ message: "Uspjesno updejtano" });
   } catch (error) {
     res.status(500).json({ error: "Server error" });
   }
