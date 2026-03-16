@@ -12,7 +12,7 @@ router.post("/register", async (req, res) => {
   try {
     const db = await connectToDatabase();
 
-    const { FirstName, LastName, email, password, role } = req.body;
+    const { FirstName, LastName, email, password, role, jmbg } = req.body;
 
     if (!FirstName || !LastName || !email || !password)
       return res.status(400).json({ error: "Potrebna sva polja" });
@@ -28,6 +28,7 @@ router.post("/register", async (req, res) => {
       LastName,
       email,
       password: hashedPassword,
+      jmbg: jmbg || "-",
       role: role || "gost",
       createdAt: new Date(),
       updatedAt: new Date(),
