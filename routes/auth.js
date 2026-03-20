@@ -35,6 +35,23 @@ router.post("/register", async (req, res) => {
     };
 
     const result = await db.collection("users").insertOne(newUser);
+
+    await db.collection("profiles").insertOne({
+      user_id: result.insertedId,
+      bio: "",
+      study_year: "",
+      department: "",
+      skill: [],
+      social: {
+        github: "",
+        linkedin: "",
+        web: "",
+      },
+      profilePicture: null,
+      isPublic: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
     res
       .status(201)
       .json({ message: "Korisnik uspjesno kreiran", id: result.insertedId });
@@ -59,14 +76,19 @@ router.post("/login", async (req, res) => {
     if (!isMatch) return res.status(400).json({ error: "Krivi podaci" });
 
     const token = jwt.sign(
-      { id: user.user_id, role: user.role, email: user.email },
+      { id: user._id.toString(), role: user.role, email: user.email },
       process.env.JWT_SECRET,
       { expiresIn: "7d" },
     );
 
     res.json({
       token,
-      user: { id: user._id, name: user.name, role: user.role },
+      user: {
+        id: user._id,
+        name: user.FirstName,
+        last_name: user.LastName,
+        role: user.role,
+      },
     });
   } catch (error) {
     res.status(500).json({ error: "Server error" });
