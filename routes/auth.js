@@ -6,8 +6,15 @@ import authMiddleware from "../middleware/auth_middleware.js";
 import { ObjectId } from "mongodb";
 import validate from "../middleware/validate_middleware.js";
 import { body } from "express-validator";
+import rateLimit from "express-rate-limit";
 
 const router = Router();
+
+const authLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 15 minutes pauza te 10 pokusaja logina
+  max: 2,
+  message: { error: "Previše pokušaja, pričekajte 15 minuta" },
+});
 
 const registracija_rules = [
   body("FirstName")
@@ -101,7 +108,7 @@ router.post("/register", registracija_rules, validate, async (req, res) => {
 });
 
 // POST /api/auth/login -- login user-a
-router.post("/login", login_rules, validate, async (req, res) => {
+router.post("/login", login_rules, validate, authLimiter, async (req, res) => {
   try {
     const db = await connectToDatabase();
     const { email, password } = req.body;
