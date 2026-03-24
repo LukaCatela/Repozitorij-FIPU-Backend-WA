@@ -6,17 +6,19 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_KEY,
   api_secret: process.env.CLOUDINARY_SECRET,
 });
-
-// store file in memory, then upload to cloudinary manually
+// sprema file u memoriji, i onda upload-a na cloud
 export const upload = multer({ storage: multer.memoryStorage() });
 
-export const uploadToCloudinary = (buffer, folder) => {
+export const uploadToCloudinary = (buffer, folder, resource_type = "image") => {
   return new Promise((resolve, reject) => {
     cloudinary.uploader
-      .upload_stream({ folder: `fipuhub/${folder}` }, (error, result) => {
-        if (error) reject(error);
-        else resolve(result);
-      })
+      .upload_stream(
+        { folder: `fipuhub/${folder}`, resource_type },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        },
+      )
       .end(buffer);
   });
 };
