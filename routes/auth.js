@@ -4,18 +4,58 @@ import jwt from "jsonwebtoken";
 import connectToDatabase from "../config/db.js";
 import authMiddleware from "../middleware/auth_middleware.js";
 import { ObjectId } from "mongodb";
+import validate from "../middleware/validate_middleware.js";
+import { body } from "express-validator";
 
 const router = Router();
 
+const registracija_rules = [
+  body("FirstName")
+    .notEmpty()
+    .withMessage("Ime je obavezno")
+    .isLength({ min: 2 })
+    .withMessage("Ime ne smije imati manje od dva slova"),
+
+  body("LastName")
+    .notEmpty()
+    .withMessage("Prezime je obavezno")
+    .isLength({ min: 2 })
+    .withMessage("Prezime mora imati najmanje 2 znaka"),
+
+  body("email")
+    .notEmpty()
+    .withMessage("Email je obavezan")
+    .isEmail()
+    .withMessage("Email nije valjan"),
+
+  body("password")
+    .notEmpty()
+    .withMessage("Lozinka je obavezna")
+    .isLength({ min: 6 })
+    .withMessage("Lozinka mora imati najmanje 6 znakova"),
+
+  body("role")
+    .optional()
+    .isIn(["student", "profesor", "admin", "gost"])
+    .withMessage("Rola nije valjana"),
+];
+
+const login_rules = [
+  body("email")
+    .notEmpty()
+    .withMessage("Email je obavezan")
+    .isEmail()
+    .withMessage("Email nije valjan"),
+
+  body("password").notEmpty().withMessage("Lozinka je obavezna"),
+];
+
 // POST /api/auth/register -- registracija user-a
-router.post("/register", async (req, res) => {
+router.post("/register", registracija_rules, validate, async (req, res) => {
   try {
     const db = await connectToDatabase();
 
     const { FirstName, LastName, email, password, role, jmbg } = req.body;
-
-    if (!FirstName || !LastName || !email || !password)
-      return res.status(400).json({ error: "Potrebna sva polja" });
 
     const existing = await db.collection("users").findOne({ email });
     if (existing) return res.status(400).json({ error: "Email vec postoji" });
@@ -61,13 +101,10 @@ router.post("/register", async (req, res) => {
 });
 
 // POST /api/auth/login -- login user-a
-router.post("/login", async (req, res) => {
+router.post("/login", login_rules, validate, async (req, res) => {
   try {
     const db = await connectToDatabase();
     const { email, password } = req.body;
-
-    if (!email || !password)
-      return res.status(400).json({ error: "Potrebna sva polja" });
 
     const user = await db.collection("users").findOne({ email });
     if (!user) return res.status(400).json({ error: "Krivi podaci" });
@@ -78,7 +115,7 @@ router.post("/login", async (req, res) => {
     const token = jwt.sign(
       { id: user._id.toString(), role: user.role, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" },
+      { expiresIn: "1d" },
     );
 
     res.json({
@@ -86,7 +123,6 @@ router.post("/login", async (req, res) => {
       user: {
         id: user._id,
         name: user.FirstName,
-        last_name: user.LastName,
         role: user.role,
       },
     });
