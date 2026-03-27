@@ -108,7 +108,7 @@ router.post("/register", registracija_rules, validate, async (req, res) => {
 });
 
 // POST /api/auth/login -- login user-a
-router.post("/login", login_rules, validate, authLimiter, async (req, res) => {
+router.post("/login", authLimiter, login_rules, validate, async (req, res) => {
   try {
     const db = await connectToDatabase();
     const { email, password } = req.body;
@@ -129,7 +129,7 @@ router.post("/login", login_rules, validate, authLimiter, async (req, res) => {
       token,
       user: {
         id: user._id,
-        name: user.FirstName,
+        FirstName: user.FirstName,
         role: user.role,
       },
     });

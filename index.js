@@ -13,9 +13,21 @@ import projektiRouter from "./routes/projects.js";
 const app = express();
 
 const PORT = 3000;
-app.use(cors({ origin: "http://localhost:5173" }));
+/*app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);*/
+
+app.use(cors());
 app.use(express.json());
-app.use(helmet({ crossOriginResourcePolicy: false })); //secures HTTP headers, protects against common attacks -> pojasnjenje
+/*app.use(
+  helmet({ crossOriginResourcePolicy: false, contentSecurityPolicy: false }),
+); //secures HTTP headers, protects against common attacks -> pojasnjenje
+
+*/
 app.use(morgan("dev")); // za laski ispis log ruta
 
 connectToDatabase().then(() => {

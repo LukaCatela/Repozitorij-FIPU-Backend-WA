@@ -2,6 +2,7 @@ import { Router } from "express";
 import connectToDatabase from "../config/db.js";
 import authMiddleware from "../middleware/auth_middleware.js";
 import roleMiddleware from "../middleware/role_middleware.js";
+import { ObjectId } from "mongodb";
 
 const router = Router();
 
@@ -11,11 +12,10 @@ router.get("/", authMiddleware, roleMiddleware("admin"), async (req, res) => {
     return res.status(403).json({ error: "Access denied" });
 
   try {
-    const db = connectToDatabase();
+    const db = await connectToDatabase();
     const users = await db
-      .collections("users")
-      .find({})
-      .project({ password: 0 })
+      .collection("users")
+      .find({}, { projection: { password: 0 } })
       .toArray();
     res.status(200).json({ users });
   } catch (error) {
@@ -54,13 +54,11 @@ router.delete(
   authMiddleware,
   roleMiddleware("admin"),
   async (req, res) => {
-    if (req.user.id !== req.params.userId)
-      return res.status(403).json({ error: "Pristup zabranjen" });
     try {
       const db = await connectToDatabase();
       await db
         .collection("users")
-        .deleteOne({ user_id: new ObjectId(req.params.userId) });
+        .deleteOne({ _id: new ObjectId(req.params.userId) });
       res.status(200).json({ message: "Korisnik izbrisan" });
     } catch (error) {
       res.status(500).json({ error: "Server error" });

@@ -2,7 +2,7 @@ import { Router } from "express";
 import connectToDatabase from "../config/db.js";
 import { ObjectId } from "mongodb";
 import authMiddleware from "../middleware/auth_middleware.js";
-import { upload, uploadToCloudinary } from "../config/cloudinary.js";
+import { upload } from "../config/cloudinary.js";
 
 const router = Router();
 
@@ -57,16 +57,21 @@ router.post(
   async (req, res) => {
     try {
       const db = await connectToDatabase();
-      const result = await uploadToCloudinary(req.file.buffer, "images");
-      const photoUrl = result.secure_url;
+
+      if (!req.file) return res.status(400).json({ error: "Nema slike" });
+
+      const photoUrl = req.file.path; // ← cloudinary URL, multer-storage-cloudinary sets this
+
       await db
         .collection("profiles")
         .updateOne(
           { user_id: new ObjectId(req.user.id) },
           { $set: { profilePicture: photoUrl, updatedAt: new Date() } },
         );
-      res.json({ profilePicture: photoUrl });
+
+      res.status(200).json({ profilePicture: photoUrl });
     } catch (error) {
+      console.log("FULL ERROR:", error);
       res.status(500).json({ error: "Server error" });
     }
   },
