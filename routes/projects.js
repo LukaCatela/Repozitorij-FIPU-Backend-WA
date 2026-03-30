@@ -36,9 +36,6 @@ router.post(
   validate,
   async (req, res) => {
     try {
-      console.log("BODY:", req.body);
-      console.log("FILES:", req.files);
-      console.log("USER:", req.user);
       const db = await connectToDatabase();
       const tags = req.body.tags
         ? req.body.tags
@@ -47,12 +44,17 @@ router.post(
             .filter(Boolean)
         : [];
 
+      const user = await db
+        .collection("users")
+        .findOne({ _id: new ObjectId(req.user.id) });
+
       const newProject = {
         title: req.body.title,
         description: req.body.description,
         tags,
         isPublic: req.body.isPublic === "true",
         ownerId: new ObjectId(req.user.id),
+        authorName: `${user.FirstName} ${user.LastName}`,
         status: "published",
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -64,7 +66,7 @@ router.post(
       console.log("BODY:", req.body);
       console.log("FILES:", req.files);
 
-      if (req.files?.pdfs) {
+      if (req.files?.images) {
         for (const file of req.files.images) {
           const result = await uploadToCloudinary(
             file.buffer,
@@ -90,9 +92,9 @@ router.post(
           const result = await uploadToCloudinary(
             file.buffer,
             "fipuhub/documents",
-            "raw", // ← pdfs need "raw"
+            "raw",
           );
-          console.log("PDF UPLOADED:", result.secure_url); // ← verify
+          console.log("PDF UPLOADED:", result.secure_url);
           mediaFiles.push({
             projectId,
             uploadedBy: new ObjectId(req.user.id),

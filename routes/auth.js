@@ -147,7 +147,13 @@ router.get("/me", authMiddleware, async (req, res) => {
         { _id: new ObjectId(req.user.id) },
         { projection: { password: 0 } },
       );
-    res.status(200).json(user);
+    const profile = await db
+      .collection("profiles")
+      .findOne({ user_id: new ObjectId(req.user.id) });
+
+    res
+      .status(200)
+      .json({ ...user, profilePicture: profile?.profilePicture || null });
   } catch (error) {
     res.status(500).json({ error: "Server error" });
   }
