@@ -12,7 +12,7 @@ const router = Router();
 
 const authLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 15 minutes pauza te 10 pokusaja logina
-  max: 2,
+  max: 20,
   message: { error: "Previše pokušaja, pričekajte 15 minuta" },
 });
 
