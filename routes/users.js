@@ -22,6 +22,23 @@ router.get("/", authMiddleware, roleMiddleware("admin"), async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+//GET    /:id         -- pojedini user
+router.get("/:id", async (req, res) => {
+  try {
+    const db = await connectToDatabase();
+    const user = await db
+      .collection("users")
+      .findOne(
+        { _id: new ObjectId(req.params.id) },
+        { projection: { password: 0 } },
+      );
+    if (!user) return res.status(404).json({ error: "Korisnik nije pronađen" });
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
 //PATCH   /:id      -- updejt user (admin ili user)
 router.patch("/:userId", authMiddleware, async (req, res) => {
   if (req.user.id !== req.params.userId)
