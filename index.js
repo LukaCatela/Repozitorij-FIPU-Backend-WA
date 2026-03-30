@@ -8,6 +8,7 @@ import authRouter from "./routes/auth.js";
 import profilesRouter from "./routes/profiles.js";
 import usersRouter from "./routes/users.js";
 import projektiRouter from "./routes/projects.js";
+import mediaRouter from "./routes/media.js";
 //const express = require('express'); //jer smo stavili u package.json type:module umisto commonjs
 
 const app = express();
@@ -35,6 +36,7 @@ connectToDatabase().then(() => {
   app.use("/projects", projektiRouter);
   app.use("/auth", authRouter);
   app.use("/profiles", profilesRouter);
+  app.use("/media", mediaRouter);
 
   app.listen(PORT, (error) => {
     if (error) {
