@@ -8,17 +8,23 @@ cloudinary.v2.config({
   api_secret: process.env.CLOUDINARY_SECRET,
 });
 
-cloudinary.v2.api.ping((error, result) => {
+/*cloudinary.v2.api.ping((error, result) => {
   if (error) console.error("Cloudinary connection FAILED:", error);
-  else console.log("Cloudinary connected ✅", result);
-});
+  else console.log("Cloudinary connected", result);
+});*/
 
 export const upload = multer({ storage: multer.memoryStorage() });
 
 export function uploadToCloudinary(buffer, folder, resourceType = "image") {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.v2.uploader.upload_stream(
-      { folder, resource_type: resourceType },
+      {
+        folder,
+        resource_type: resourceType,
+        use_filename: true,
+        unique_filename: true,
+        format: resourceType === "raw" ? undefined : undefined,
+      },
       (error, result) => {
         if (error) reject(error);
         else resolve(result);
