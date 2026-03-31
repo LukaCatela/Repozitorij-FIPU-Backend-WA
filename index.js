@@ -1,8 +1,8 @@
 import express from "express";
 import cors from "cors";
 import connectToDatabase from "./config/db.js";
-import helmet from "helmet";
 import morgan from "morgan";
+import { config } from "dotenv";
 
 import authRouter from "./routes/auth.js";
 import profilesRouter from "./routes/profiles.js";
@@ -10,10 +10,11 @@ import usersRouter from "./routes/users.js";
 import projektiRouter from "./routes/projects.js";
 import mediaRouter from "./routes/media.js";
 //const express = require('express'); //jer smo stavili u package.json type:module umisto commonjs
+config();
 
 const app = express();
 
-const PORT = 3000;
+const PORT = process.env.PORT;
 /*app.use(
   cors({
     origin: "http://localhost:5173",
@@ -22,7 +23,11 @@ const PORT = 3000;
   }),
 );*/
 
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "https://fipuhub.netlify.app"],
+  }),
+);
 app.use(express.json());
 /*app.use(
   helmet({ crossOriginResourcePolicy: false, contentSecurityPolicy: false }),
