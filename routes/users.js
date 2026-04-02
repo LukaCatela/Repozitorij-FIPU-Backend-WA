@@ -23,6 +23,30 @@ router.get("/", authMiddleware, roleMiddleware("admin"), async (req, res) => {
   }
 });
 
+//dohvati usere po trazilici
+router.get("/search", async (req, res) => {
+  try {
+    const db = await connectToDatabase();
+    const q = req.query.q || "";
+    const users = await db
+      .collection("users")
+      .find(
+        {
+          $or: [
+            { FirstName: { $regex: q, $options: "i" } }, // case-insensitive zato je i
+            { LastName: { $regex: q, $options: "i" } },
+          ],
+        },
+        { projection: { password: 0 } },
+      )
+      .limit(8)
+      .toArray();
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 //GET    /:id         -- pojedini user
 router.get("/:id", async (req, res) => {
   try {
@@ -39,8 +63,10 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+// Trenutno jos ne koristim ovu rutu - ako stignema
 //PATCH   /:id      -- updejt user (admin ili user)
-router.patch("/:userId", authMiddleware, async (req, res) => {
+/*router.patch("/:userId", authMiddleware, async (req, res) => {
   if (req.user.id !== req.params.userId)
     return res.status(403).json({ error: "Pristup zabranjen" });
 
@@ -63,7 +89,7 @@ router.patch("/:userId", authMiddleware, async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: "Server error" });
   }
-});
+});*/
 
 //DELETE /:id      -- izbrisi usera (admin)
 router.delete(

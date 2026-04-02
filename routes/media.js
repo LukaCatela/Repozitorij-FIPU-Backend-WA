@@ -4,6 +4,7 @@ import { ObjectId } from "mongodb";
 
 const router = Router();
 
+// GET ruta za dohvacanje slika i pdf iz baze
 router.get("/:projectId", async (req, res) => {
   const db = await connectToDatabase();
   const files = await db

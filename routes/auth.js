@@ -16,6 +16,7 @@ const authLimiter = rateLimit({
   message: { error: "Previše pokušaja, pričekajte 15 minuta" },
 });
 
+// pravila za forme kod registracije i logina
 const registracija_rules = [
   body("FirstName")
     .notEmpty()

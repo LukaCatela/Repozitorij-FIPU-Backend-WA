@@ -7,13 +7,13 @@ import validate from "../middleware/validate_middleware.js";
 import { upload, uploadToCloudinary } from "../config/cloudinary.js";
 const router = Router();
 
-// accept both "images" and "pdfs" fields from frontend
+// prihvati slike i pdf-ove sa frontenda
 const uploadFields = upload.fields([
   { name: "images", maxCount: 10 },
   { name: "pdfs", maxCount: 5 },
 ]);
 
-// validation rules
+// pravila validacije
 const projectRules = [
   body("title")
     .notEmpty()
@@ -73,7 +73,7 @@ router.post(
             "fipuhub/images",
             "image",
           );
-          console.log("IMAGE UPLOADED:", result.secure_url);
+          //console.log("IMAGE UPLOADED:", result.secure_url);
           mediaFiles.push({
             projectId,
             uploadedBy: new ObjectId(req.user.id),
@@ -173,7 +173,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// vraca projekte logiranog usera
+// GET /me - vraca projekte logiranog usera
 router.get("/me", authMiddleware, async (req, res) => {
   try {
     const db = await connectToDatabase();
