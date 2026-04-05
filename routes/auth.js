@@ -46,6 +46,11 @@ const registracija_rules = [
     .optional()
     .isIn(["student", "profesor", "admin", "gost"])
     .withMessage("Rola nije valjana"),
+
+  body("jmbg")
+    .optional({ nullable: true, checkFalsy: true })
+    .matches(/^\d{10}$/)
+    .withMessage("JMBG mora imati točno 10 znamenki"),
 ];
 
 const login_rules = [
@@ -65,11 +70,19 @@ router.post("/register", registracija_rules, validate, async (req, res) => {
 
     const { FirstName, LastName, email, password, role, jmbg } = req.body;
 
-    const existing = await db.collection("users").findOne({ email });
-    if (existing) return res.status(400).json({ error: "Email vec postoji" });
+    const existing_email = await db.collection("users").findOne({ email });
+    if (existing_email)
+      return res.status(400).json({ error: "Email vec postoji" });
+
+    if (jmbg && jmbg !== "-" && jmbg !== "") {
+      const existing_jmbg = await db.collection("users").findOne({ jmbg });
+      console.log(existing_jmbg);
+      if (existing_jmbg)
+        return res.status(400).json({ error: "JMBG vec postoji" });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user_id = (await db.collection("users").count()) + 1;
+    const user_id = (await db.collection("users").countDocuments()) + 1;
     const newUser = {
       user_id,
       FirstName,
