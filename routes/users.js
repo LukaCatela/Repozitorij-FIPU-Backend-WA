@@ -8,9 +8,6 @@ const router = Router();
 
 //GET    /         -- svi useri (admin)
 router.get("/", authMiddleware, roleMiddleware("admin"), async (req, res) => {
-  if (req.user.role !== "admin" && req.user.id !== req.params.userId)
-    return res.status(403).json({ error: "Access denied" });
-
   try {
     const db = await connectToDatabase();
     const users = await db
