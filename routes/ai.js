@@ -1,9 +1,6 @@
 import { Router } from "express";
 import connectToDatabase from "../config/db.js";
 import authMiddleware from "../middleware/auth_middleware.js";
-import { config } from "dotenv";
-
-config();
 
 const router = Router();
 
@@ -50,7 +47,8 @@ router.post("/project", authMiddleware, async (req, res) => {
             Odgovori na hrvatskom u ovom formatu:
             1. SLIČNI PROJEKTI: Navedi koji postojeći projekti su slični i zašto (ako nema sličnih, reci to)
             2. ŠTO PROJEKT ČINI JEDINSTVENIM: Što student može dodati da se razlikuje od drugih projekata
-            3. PRIJEDLOZI ZA RAZVOJ: 3 konkretna prijedloga kako razviti ideju`,
+            3. PRIJEDLOZI ZA RAZVOJ: 3 konkretna prijedloga kako razviti ideju
+            4. OPIS: Napiši kratki opis sa ova prethodna 2 poglavlja bez sličnih projekata`,
           },
         ],
       }),
