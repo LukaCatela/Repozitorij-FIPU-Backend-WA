@@ -3,6 +3,7 @@ import { ObjectId } from "mongodb";
 import { body } from "express-validator";
 import connectToDatabase from "../config/db.js";
 import authMiddleware from "../middleware/auth_middleware.js";
+import roleMiddleware from "../middleware/role_middleware.js";
 import validate from "../middleware/validate_middleware.js";
 import { upload, uploadToCloudinary } from "../config/cloudinary.js";
 const router = Router();
@@ -137,13 +138,11 @@ router.get("/", async (req, res) => {
     const db = await connectToDatabase();
 
     const page = parseInt(req.query.page) || 1;
-    const limit = 9; // projects per page
+    const limit = 9;
     const skip = (page - 1) * limit;
 
-    // build filter
     const filter = { isPublic: true };
 
-    // search by title or description
     if (req.query.search) {
       filter.$or = [
         { title: { $regex: req.query.search, $options: "i" } },
@@ -151,15 +150,11 @@ router.get("/", async (req, res) => {
       ];
     }
 
-    // filter by tag
     if (req.query.tag) {
       filter.tags = { $in: [req.query.tag] };
     }
-
-    // get total count for pagination
     const total = await db.collection("projects").countDocuments(filter);
 
-    // get paginated projects
     const projects = await db
       .collection("projects")
       .find(filter)
