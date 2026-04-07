@@ -4,11 +4,13 @@ import connectToDatabase from "./config/db.js";
 import morgan from "morgan";
 import { config } from "dotenv";
 
+// Routeri
 import authRouter from "./routes/auth.js";
 import profilesRouter from "./routes/profiles.js";
 import usersRouter from "./routes/users.js";
 import projektiRouter from "./routes/projects.js";
 import mediaRouter from "./routes/media.js";
+import claudeRouter from "./routes/ai.js";
 //const express = require('express'); //jer smo stavili u package.json type:module umisto commonjs
 config();
 
@@ -42,6 +44,7 @@ connectToDatabase().then(() => {
   app.use("/auth", authRouter);
   app.use("/profiles", profilesRouter);
   app.use("/media", mediaRouter);
+  app.use("/ai", claudeRouter);
 
   app.listen(PORT, (error) => {
     if (error) {
